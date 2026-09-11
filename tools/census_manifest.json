@@ -1,4 +1,5 @@
 {
+  "_comment": "SETUP: edit this file for your project. Set chain_id (the fork chain your evidence pins), and one entry per contract module under 'modules' (id, status, sources glob, builder_lens, and plans[].path with author_lens != builder_lens). List each release's modules under 'releases'. Then: python3 tools/checkpoint_census.py --release <name>. Full guide: ../README.md (Quickstart) and tools/CHECKPOINT_CENSUS.md.",
   "schema_version": "1",
   "milestone": "M1",
   "chain_id": 1,
@@ -6,17 +7,27 @@
   "audit_ledger": "docs/deep/AUDIT_PROVENANCE.md",
   "snapshots_path": "tools/census_snapshots.json",
   "releases": {
-    "checkpoint": ["example-module"]
+    "checkpoint": [
+      "example-module"
+    ]
   },
   "modules": [
     {
       "id": "example-module",
       "status": "built",
       "builder_lens": "builder-model",
-      "required_inventory_kinds": ["physical"],
-      "sources": ["src/example/*.sol"],
+      "required_inventory_kinds": [
+        "physical"
+      ],
+      "sources": [
+        "src/example/*.sol"
+      ],
       "plans": [
-        { "path": "docs/checkpoints/plan_example.md", "author_lens": "checker-model", "default_contract": "Example" }
+        {
+          "path": "docs/checkpoints/plan_example.md",
+          "author_lens": "checker-model",
+          "default_contract": "Example"
+        }
       ]
     }
   ]

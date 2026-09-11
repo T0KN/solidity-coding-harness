@@ -4,6 +4,16 @@ A drop-in starting point for Solidity/Foundry repos that ships with a **merge-bl
 
 > **Use this as a template.** In GitHub → this repo → **Settings → General → ✔ Template repository**. Then start every new project with **"Use this template" → Create a new repository** — the whole harness comes pre-wired.
 
+## ▶ Starting a project here — read me first (you don't need to remember any commands)
+
+When you create a repo from this template and begin a project:
+
+1. **You (coordinator):** create the repo, then hand it to your build + checker agents with **one line**:
+   > *"This repo ships the checkpoint-census harness. Run `python3 tools/census_selftest.py` to confirm it's healthy, then set up `tools/census_manifest.json` for our contracts and follow `docs/SOLIDITY_VERIFICATION_HARNESS.md` as we build — the CI gate must be green before any merge."*
+2. **The agent** runs the self-test (a ~1-second health check → `36 tests OK`), fills in the manifest with your actual contracts, and from then on the CI gate blocks any merge whose per-function checkpoint isn't complete and proven.
+
+That's the whole workflow for you. Everything is already **in this repo** — nothing to install or memorize beyond "Use this template" + the line above. The `Quickstart` and `docs/` below are the details the agents follow.
+
 ## What you get
 
 - **`docs/SOLIDITY_VERIFICATION_HARNESS.md`** — the doctrine (11 tenets + the trust boundary). Read it first.
