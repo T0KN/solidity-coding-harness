@@ -1,0 +1,18 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.26;
+
+// SYNTHETIC CENSUS SELFTEST ONLY. Not a module or an audit oracle.
+contract Fixture {
+    mapping(address => uint256) private balances;
+
+    function credit(address recipient) external payable {
+        balances[recipient] += msg.value;
+    }
+
+    function claim() external {
+        uint256 amount = balances[msg.sender];
+        balances[msg.sender] = 0;
+        (bool sent,) = msg.sender.call{value: amount}("");
+        require(sent);
+    }
+}

@@ -1,0 +1,20 @@
+name: checkpoint-census
+# Required status check: blocks merge unless every module's per-function checkpoint is complete,
+# source-bound, and backed by pinned-fork evidence. See tools/CHECKPOINT_CENSUS.md.
+on:
+  pull_request:
+  push:
+    branches: [main]
+jobs:
+  census:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { submodules: recursive }
+      - uses: foundry-rs/foundry-toolchain@v1
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - name: Self-test the gate (never touches project evidence)
+        run: python3 tools/census_selftest.py
+      - name: Checkpoint census (required)
+        run: python3 tools/checkpoint_census.py --release "${CENSUS_RELEASE:-checkpoint}"

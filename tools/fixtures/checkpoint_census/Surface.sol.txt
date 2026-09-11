@@ -1,0 +1,42 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.26;
+
+// SYNTHETIC compiler-denominator fixture. No protocol contract is changed.
+interface Peer {
+    function mint(address recipient, uint256 amount) external;
+}
+
+library Shapes {
+    function allocate(uint256 n) internal pure returns (uint256[] memory) {
+        return new uint256[](n);
+    }
+}
+
+contract Parent {
+    address public owner;
+    constructor(address recipient) payable {
+        (bool sent,) = recipient.call{value: msg.value}("");
+        require(sent);
+    }
+    function inheritedEntry() external { _pay(owner); }
+    function transferOwnership(address next) public { owner = next; }
+    function _pay(address recipient) internal {
+        (bool sent,) = recipient.call{value: 1}("");
+        require(sent);
+    }
+}
+
+contract Surface is Parent {
+    uint256 public constant NUMBER = 7;
+    constructor(address recipient) payable Parent(recipient) {}
+    modifier mintFirst(Peer peer) { peer.mint(msg.sender, 1); _; }
+    function withModifier(Peer peer) external mintFirst(peer) {}
+    function viaHelper(Peer peer) external { _helper(peer); }
+    function _helper(Peer peer) internal { peer.mint(msg.sender, 1); }
+    function overloaded(uint256) public pure {}
+    function overloaded(address) public pure {}
+    function allocate(uint256 n) public pure returns (uint256[] memory) { return Shapes.allocate(n); }
+    function viaPointer(function() internal callback) internal { callback(); }
+    receive() external payable {}
+    fallback() external payable {}
+}

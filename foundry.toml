@@ -1,0 +1,21 @@
+[profile.default]
+src = "src"
+test = "test"
+out = "out"
+libs = ["lib"]
+solc = "0.8.26"
+optimizer = true
+optimizer_runs = 200
+fs_permissions = [{ access = "read", path = "./" }]
+
+[fuzz]
+runs = 256
+
+[invariant]
+runs = 256
+depth = 500
+fail_on_revert = false
+
+# Fork endpoints for pinned evidence runs — values come from the environment, never committed.
+[rpc_endpoints]
+fork = "${FORK_RPC_URL}"
