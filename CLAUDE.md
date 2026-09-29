@@ -21,3 +21,6 @@
 
 ## Secrets
 Never print, paste, or commit an RPC key or secret. Source it from a gitignored `.env`; redact it from all output.
+
+## Working rules
+The day-to-day operating rules for the seats (merges, PRs, briefs, discipline, spend, handoffs) are in `docs/WORKING_RULES.md`. They are binding alongside the harness; copy or link them into every project created from this template.
