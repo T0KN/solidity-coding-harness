@@ -14,7 +14,23 @@ jobs:
       - uses: foundry-rs/foundry-toolchain@v1
       - uses: actions/setup-python@v5
         with: { python-version: "3.12" }
+      - name: Warm the compiler cache (the census builds --offline; a fresh runner has no solc)
+        run: |
+          set -euo pipefail
+          for v in 0.8.35 0.8.26; do
+            d=$(mktemp -d); mkdir -p "$d/src"
+            printf '[profile.default]\nsolc_version = "%s"\n' "$v" > "$d/foundry.toml"
+            printf 'pragma solidity %s;\ncontract Warm {}\n' "$v" > "$d/src/Warm.sol"
+            forge build --root "$d" >/dev/null
+            echo "warm: solc $v cached"
+          done
       - name: Self-test the gate (never touches project evidence)
         run: python3 tools/census_selftest.py
-      - name: Checkpoint census (required)
-        run: python3 tools/checkpoint_census.py --release "${CENSUS_RELEASE:-checkpoint}"
+      - name: Checkpoint census (required once contracts exist under src/)
+        run: |
+          set -euo pipefail
+          if ! find src -name '*.sol' -print -quit | grep -q .; then
+            echo "census: SKIPPED - bare template (no Solidity under src/); the gate becomes required when contracts land and tools/census_manifest.json is configured"
+            exit 0
+          fi
+          python3 tools/checkpoint_census.py --release "${CENSUS_RELEASE:-checkpoint}"
