@@ -14,6 +14,20 @@ When you create a repo from this template and begin a project:
 
 That's the whole workflow for you. Everything is already **in this repo** — nothing to install or memorize beyond "Use this template" + the line above. The `Quickstart` and `docs/` below are the details the agents follow.
 
+## Day-one repo setup (do this before the first agent touches the repo)
+
+A gate that nothing enforces is only advice. On day one, as the repo owner, in the browser:
+
+1. **A ruleset on `main`** (Settings → Rules → Rulesets → New branch ruleset, enforcement Active):
+   - require a pull request before merging, with 0 required approvals (you stay the only merger);
+   - require status checks to pass, with "branches up to date" ticked: add the gate's `census` check (workflow `checkpoint-census`) and every other CI check the moment it first reports;
+   - restrict deletions and block force pushes;
+   - **no bypass list.** Agents usually act through your login, so an admin bypass is theirs too. In an emergency, switch the ruleset off yourself and back on.
+2. **Agent tokens: fine-grained and least privilege.** Contents, Pull requests, Actions, Workflows and Metadata only. Never Administration, never Secrets. Keep each token in the repo's gitignored `.env.local`.
+3. **CI order:** the secret scan runs first, in its own job, on a fresh checkout with the base branch's config; every job that runs repo code depends on it.
+4. **Gate files:** the workflows, CI scripts and scan config change only through a labelled, reviewed PR.
+5. **A daily off-machine backup** of every repo (all refs as git bundles) plus uncommitted worktree changes.
+
 ## What you get
 
 - **`docs/SOLIDITY_VERIFICATION_HARNESS.md`** — the doctrine (11 tenets + the trust boundary). Read it first.
