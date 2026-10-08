@@ -10,11 +10,10 @@ Binding alongside `WORKING_RULES.md`. Every coordinator (one per repository) run
 ## 2. The start command (the standard launch)
 ```
 tmux new-session -d -s <seat> -n "<SEAT NAME>" -x 200 -y 50 -c <repo> \
-  "CODEX_HOME=<home> codex --model <model> \
-   -c sandbox_mode=\"workspace-write\" \
-   -c 'sandbox_workspace_write.writable_roots=[\"<repo>/.git\"]'"
+  "CODEX_HOME=<home> codex --model <model>"
 ```
-- The two `-c` overrides make git-metadata writes (fetch, branch, commit, push to the seat's own branches) part of the seat's sandbox, so they do not prompt. **Nothing else changes:** no `approval_policy`, no wider roots; every other out-of-sandbox action still prompts, and `main` stays protected by the repository ruleset, so a silent push can never reach it.
+- **No sandbox widening.** An earlier version of this page added `.git` as a writable root so that fetch/branch/commit/push would not prompt. **Withdrawn 2026-10-07:** the sandbox has no finer grain than a directory, so that root also makes `.git/hooks` and `.git/config` seat-writable — a seat could install a hook that later runs unsandboxed in the coordinator's or the owner's git, or rewrite the credential helper that emits the token — and nothing of it shows in a PR diff (found by the app coordinator's Sonnet read, reproduced with Codex's own sandbox tooling). No `approval_policy` change either. The seat runs Codex's defaults; git-metadata writes prompt.
+- **How those prompts are handled:** the owner may give a standing word that standard git prompts on the seat's OWN branches (fetch, branch, commit, push; never `main`, never another seat's branch) are pressed by the coordinator without relaying. Everything else is relayed (§4). Never "don't ask again".
 - The launch command lives wherever the seat is actually launched from: if a dispatcher script relaunches the window per task, the command lives in that script; if the session persists and tasks are pasted in, the command is recorded in the repository's ops notes. Either way it is in git, not in a chat.
 - The owner trusts the repository folder once at the seat's first start (Codex asks; the coordinator never answers that prompt).
 
@@ -28,7 +27,7 @@ tmux new-session -d -s <seat> -n "<SEAT NAME>" -x 200 -y 50 -c <repo> \
 1. Each seat pane has a **silent watcher** that exits when an approval prompt is waiting (and on a timeout, when it is re-armed). It is a read-only script allowed by a permission rule so it never needs a judge.
 2. When a prompt waits, the coordinator sends the owner the **exact prompt text and its numbered choices** (one phone push when the owner is away) and presses **only the choice the owner names**. The coordinator never answers a prompt on its own, never picks "always allow / don't ask again", and never presses a model-downgrade option.
 3. The watcher can fire on the `/new` thread picker; the coordinator looks before relaying.
-4. A seat running under §2's overrides prompts rarely; the relay stays armed anyway.
+4. Under the owner's standing word (§2), standard git prompts on the seat's own branches are pressed by the coordinator; the relay stays armed for everything else.
 
 ## 5. The build watcher and the lane log
 1. Each dispatch gets a background watcher in the same turn that appends to one lane-status file (dispatch time, boundary, result path) and exits at the seat's boundary, on a lost pane, or when free disk falls under **20 GB** (a Foundry or fork-cache run can fail at 10).
@@ -49,7 +48,7 @@ Every stage note carries: the base and head commits; the delta map by plan row w
 3. Never resume a large-context thread for a small fix; dispatch a fresh one.
 
 ## 9. What never changes without the owner's word
-Repository settings and rulesets; a shared home's `config.toml`; the approval policy or the writable roots of any seat; the start command's model; any seat's checkout being deleted or moved. A coordinator proposes; the owner says the word; the change is recorded in git.
+Repository settings and rulesets; a shared home's `config.toml`; the approval policy, the sandbox mode or the writable roots of any seat (never widened); the start command's model; any seat's checkout being deleted or moved. A coordinator proposes; the owner says the word; the change is recorded in git.
 
 ## 10. Alignment
-Each coordinator aligns its seats to this page once (one tooling PR per repository where a dispatcher must carry the start command) and reports the alignment in its next status: the start command as launched, the watcher paths, and the first task's hand-back showing a `git fetch` without a prompt.
+Each coordinator aligns its seats to this page once (one tooling PR per repository where a dispatcher must carry the start command) and reports the alignment in its next status: the start command as launched, the watcher paths, and the owner's standing word on git prompts, if given.
