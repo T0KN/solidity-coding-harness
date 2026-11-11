@@ -21,7 +21,7 @@
 12. **Lanes are fixed capability contracts; landings are checked by script** — author, run and lens lanes each get their contract from the dispatcher; a landing needs the land check plus a non-author lens; no force flag and no pushed-branch rewrite, ever (`docs/WORKING_RULES.md` rules 23-39, `docs/SEAT_OPERATIONS.md` §11).
 
 ## The gate
-`tools/checkpoint_census.py` is a CI check (see `.github/workflows/checkpoint-census.yml`). The census workflow is supplied; it becomes a merge requirement only after the owner configures and verifies the branch protections. It reads the checker's plan + evidence against the *compiled* source and blocks the merge unless coverage, value-edges, call-resolutions, obligations, provenance, and evidence are all complete. It proves the checkpoint is complete and bound — **not** that its content is true (that's rule 7).
+`tools/checkpoint_census.py` is a CI check (see `.github/workflows/checkpoint-census.yml`). The census workflow is supplied; it becomes a merge requirement only after the owner configures and verifies the branch protections. It reads the checker's plan + evidence against the *compiled* source and fails unless coverage, value-edges, call-resolutions, obligations, provenance, and evidence are all complete. It proves the checkpoint is complete and bound — **not** that its content is true (that's rule 7).
 
 ## Secrets
 Never print, paste, or commit an RPC key or secret. Source it from a gitignored `.env`; redact it from all output.

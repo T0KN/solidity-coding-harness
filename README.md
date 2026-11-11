@@ -37,7 +37,7 @@ A gate that nothing enforces is only advice, and a local hook is not enforcement
 - **`docs/SOLIDITY_VERIFICATION_HARNESS.md`** — the doctrine (20 tenets + the trust boundary): tenets 12-20 cover decisive controls, real committed inputs, constants bound to bytes, frozen source, off-chain predicates, analyzer dispositions, acceptance authenticated from outside its index, closing records and the deploy ceremony. Read it first.
 - **`docs/WORKING_RULES.md`** — how the seats work day to day (39 rules): merge tiers priced by undo cost (rule 1), no force flags or pushed-branch rewrites (rule 23), and §6 "Lanes, gates and landings" (rules 24-39).
 - **`docs/SEAT_OPERATIONS.md`** — how a coordinator runs its seats, including §11, headless one-shot lanes: the capability table per lane type, verbatim commits of author-lane work, the published gate file, and no added writable roots.
-- **`tools/`** — the **census gate**: compiler census, plan/provenance adapters, evidence schema, a template manifest, and a **36-test self-test**. This is the required CI check. (A shared tier gate, `tools/tier/`, is planned: it is to be added by a separate PR after both lenses, per rule 1j.)
+- **`tools/`** — the **census gate**: compiler census, plan/provenance adapters, evidence schema, a template manifest, and a **36-test self-test**. It becomes a required CI check once the owner has configured and verified branch protection. (A shared tier gate, `tools/tier/`, is planned: it is to be added by a separate PR after both lenses, per rule 1j.)
 - **`.github/workflows/checkpoint-census.yml`** — the gate wired as a status check (add it to branch protection).
 - **`foundry.toml`, `.gitignore`, `.env.example`** — a sane Foundry baseline.
 - **`CLAUDE.md`** — governance for any AI/agent seat working the repo (points at the doctrine and the rules).
@@ -64,7 +64,7 @@ python3 tools/checkpoint_census.py --release checkpoint   # must be 0 hard failu
 - **pinned-fork proof-of-check** — a row/obligation is PASS only with real evidence (chain-pinned fork + hashed tests + per-edge witnesses), never a test name.
 - **gate-green ≠ correct** — a green gate proves coverage/binding, not truth. The adversarial content audit is done *on top of* a green gate, before landing.
 - **controls are decisive and bound to bytes** — every negative control is shown failing with its guard removed; positive controls read the real committed input; constants are re-earned on the merged tree (tenets 12-15).
-- **merges are priced by undo cost** — a script decides the tier from what changed and fails closed; the coordinator merges tier 1 only, never into `main`; the host, not a local hook, is the wall (rule 1).
+- **merges are priced by undo cost** — a script decides the tier from what changed and fails closed; the coordinator merges tier 1 only, never into `main`; a local hook is defence in depth, and the host-side controls are the enforcement once the owner has configured and tested them (rule 1).
 - **landings are checked by script, then by a non-author lens** — the coordinator's landing record names a real implementation commit, nothing was rewritten, and the selftest is re-run by the coordinator (rules 33-34).
 - **no force flags, ever** — no agent rewrites a pushed branch or runs a force flag; a refused destructive action is never retried (rule 23).
 
