@@ -15,6 +15,10 @@
 6. **Pinned-fork proof-of-check** — PASS needs real evidence (chain-pinned fork + hashed tests + raw artifacts + derived counts + per-edge witnesses), never a test name or the word "PASS".
 7. **Gate-green ≠ correct** — after the gate is green, adversarially audit content before landing: prove every label, bind evidence to the *exact* assertion, resolve every citation, derive every number, run at strictest; report the shortcuts you fixed.
 8. **No shortcuts on money/reentrancy/access/migration** — strongest model + adversarial verification; never downgrade a verifier to save tokens.
+9. **Controls are decisive and bound to bytes** — every negative control is shown failing with its guard removed; a positive control reads the real committed input; calibration constants are re-earned on the merged tree; frozen source is compared by hash (doctrine tenets 12-15).
+10. **Off-chain predicates, acceptance and the send** — an unenforced predicate is named off-chain with a refusing preflight; acceptance is authenticated from outside its index; each stage has a closing record; the deploy ceremony is rehearsed, verified by nonce, and runs only on the owner's word (tenets 16-20).
+11. **Merges are priced by undo cost** — a script decides the tier from what changed and fails closed; only the coordinator merges, tier 1 only, never into `main`; the host is the wall, not a local hook (`docs/WORKING_RULES.md` rule 1).
+12. **Lanes are fixed capability contracts; landings are checked by script** — author, run and lens lanes each get their contract from the dispatcher; a landing needs the land check plus a non-author lens; no force flag and no pushed-branch rewrite, ever (`docs/WORKING_RULES.md` rules 23-39, `docs/SEAT_OPERATIONS.md` §11).
 
 ## The gate
 `tools/checkpoint_census.py` is a **required CI check** (see `.github/workflows/checkpoint-census.yml`). It reads the checker's plan + evidence against the *compiled* source and blocks the merge unless coverage, value-edges, call-resolutions, obligations, provenance, and evidence are all complete. It proves the checkpoint is complete and bound — **not** that its content is true (that's rule 7).
@@ -23,7 +27,7 @@
 Never print, paste, or commit an RPC key or secret. Source it from a gitignored `.env`; redact it from all output.
 
 ## Working rules
-The day-to-day operating rules for the seats (merges, PRs, briefs, discipline, spend, handoffs) are in `docs/WORKING_RULES.md`. How a coordinator runs a builder seat day to day (the start command, one task per fresh thread, the approval relay, watchers, the stop rule, hand-backs, budget) is `docs/SEAT_OPERATIONS.md`, binding alongside it. They are binding alongside the harness; copy or link them into every project created from this template.
+The day-to-day operating rules for the seats (merge tiers, PRs, briefs, discipline, spend, handoffs, and §6 "Lanes, gates and landings") are in `docs/WORKING_RULES.md`. How a coordinator runs a builder seat day to day (the start command, one task per fresh thread, the approval relay, watchers, the stop rule, hand-backs, budget) and its headless one-shot lanes (§11: the capability table, verbatim commits, the published gate file, no added writable roots) is `docs/SEAT_OPERATIONS.md`, binding alongside it. They are binding alongside the harness; copy or link them into every project created from this template.
 
 ## Agent spend and seat tiers
 
