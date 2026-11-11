@@ -2,7 +2,7 @@
 
 > The discipline this project uses to prove a contract module is correct — not that it compiles, not that tests pass, but that an **independent lens has shown, function by function, with cited source and executed pinned-fork evidence, that every value path does exactly what it claims**, and a machine gate has confirmed that proof is complete.
 >
-> This doc is the project copy. The same doctrine is installed globally at `~/.claude/rules/solidity/` (auto-applied to all Solidity work); the mechanical enforcement is the checkpoint-census gate (reference implementation in `tools/`; portable template in `docs/deep/checkpoint-census-kit/`).
+> This repository is the versioned source for the doctrine. Global Solidity rules may be installed separately; verify their version and reconcile differences before treating them as equivalent. The census implementation is in `tools/`.
 
 ## Why
 
@@ -48,17 +48,17 @@ Contract code is adversarial, immutable once deployed, and moves money. "It comp
 
 19. **Every stage closes with a closing record.** It names the lenses assigned, the decorrelated lenses that actually executed (with their run ids), and every carried item with its owner and the gate that will close it. A stage with a carried item that has no owner or gate is not closed.
 
-20. **The deploy ceremony is designed and tested before the send.** Resume after an interruption and recovery from a duplicate broadcast are built and rehearsed before the first transaction: a wallet can broadcast one signed transaction twice, and the duplicate's "nonce too low" error is not a failure. Verification is by nonce: read the sender's nonce and find the mined transaction for it before deciding anything, and never re-send on an error alone. Nothing is sent before every piece of readback evidence it depends on is validated. Frozen rehearsal evidence is loaded in one place: every digest the freeze records is verified from bytes read once, every consumer uses those retained bytes, and a file the freeze does not bind never feeds a decision (2026-11: four lens rounds on a resume tool each found one more frozen file consumed before it was checked). Wallet settings that a creation needs (a hardware wallet's blind signing) are on the operator checklist. Every one-way write (deploy, immutables, ownership, a multisig execution) is named one-way and runs only on the owner's word; a plan line, a green gate or a ratified ruling is never that word. (2026-11: a live runner that stopped on any send error and could not resume met a wallet that broadcast three of fourteen sends twice; every first copy had been mined.)
+20. **The deploy ceremony is designed and tested before the send.** Resume after an interruption and recovery from a duplicate broadcast are built and rehearsed before the first transaction: a wallet can broadcast one signed transaction twice, and the duplicate's "nonce too low" error is not a failure. Verification is by nonce: read the sender's nonce and find the mined transaction for it before deciding anything, and never re-send on an error alone. Nothing is sent before every piece of readback evidence it depends on is validated. Frozen rehearsal evidence is loaded in one place: every digest the freeze records is verified from bytes read once, every consumer uses those retained bytes, and a file the freeze does not bind never feeds a decision. Wallet settings that a creation needs (a hardware wallet's blind signing) are on the operator checklist. Every one-way write (deploy, immutables, ownership, a multisig execution) is named one-way and runs only on the owner's word; a plan line, a green gate or a ratified ruling is never that word.
 
 ## The mechanical harness
 
-The tenets above are only real because a **merge-blocking required check** enforces them. The census gate:
+The census gate enforces the coverage and binding checks listed below. It does not mechanically enforce every tenet; the additional project controls and their implementation status are recorded under working rule 38.
 
 1. **compiles → census** — emits the authoritative per-function list from the compiled artifact (never a hand-written list);
 2. **checks the checker's plan + evidence against that census** — a coverage/consistency check that never turns prose into evidence;
-3. **is wired into branch protection** as a required status check.
+3. The census workflow is supplied; it becomes a merge requirement only after the owner configures and verifies the branch protections.
 
-Reference implementation: `tools/checkpoint_census.py` (+ `census_source.py`, `census_documents.py`, `census_manifest.json`, `census_selftest.py`, `CHECKPOINT_CENSUS.md`). Portable, project-agnostic template to reuse elsewhere: `docs/deep/checkpoint-census-kit/` — copy it into a new Foundry repo, set `chain_id` + modules in the manifest, wire the CI check.
+Reference implementation: `tools/checkpoint_census.py`, `census_source.py`, `census_documents.py`, `census_manifest.json`, `census_selftest.py` and `CHECKPOINT_CENSUS.md`. Reuse this repository as the template, configure its manifest, and have the owner configure and verify the required CI check.
 
 ## The trust boundary (never blur it)
 

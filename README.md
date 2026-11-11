@@ -1,8 +1,8 @@
 # Solidity Coding Harness
 
-A drop-in starting point for Solidity/Foundry repos that ships with a **merge-blocking verification harness** baked in. A module cannot merge until an *independent lens* has proven, function by function, with cited source and executed pinned-fork evidence, that every value path does exactly what it claims — and a machine gate has confirmed that proof is complete.
+A drop-in starting point for Solidity/Foundry repos that ships with a **verification harness**. The census workflow is supplied; it becomes a merge requirement only after the owner configures and verifies the branch protections. A module cannot merge until an *independent lens* has proven, function by function, with cited source and executed pinned-fork evidence, that every value path does exactly what it claims — and a machine gate has confirmed that proof is complete.
 
-> **Use this as a template.** In GitHub → this repo → **Settings → General → ✔ Template repository**. Then start every new project with **"Use this template" → Create a new repository** — the whole harness comes pre-wired.
+> **Use this as a template.** In GitHub → this repo → **Settings → General → ✔ Template repository**. Then start every new project with **"Use this template" → Create a new repository**. The census workflow is supplied; it becomes a merge requirement only after the owner configures and verifies the branch protections.
 
 ## ▶ Starting a project here — read me first (you don't need to remember any commands)
 
@@ -10,23 +10,23 @@ When you create a repo from this template and begin a project:
 
 1. **You (coordinator):** create the repo, then hand it to your build + checker agents with **one line**:
    > *"This repo ships the checkpoint-census harness. Run `python3 tools/census_selftest.py` to confirm it's healthy, then set up `tools/census_manifest.json` for our contracts and follow `docs/SOLIDITY_VERIFICATION_HARNESS.md` as we build — the CI gate must be green before any merge."*
-2. **The agent** runs the self-test (a ~1-second health check → `36 tests OK`), fills in the manifest with your actual contracts, and from then on the CI gate blocks any merge whose per-function checkpoint isn't complete and proven.
+2. **The agent** runs the self-test (a ~1-second health check → `36 tests OK`) and fills in the manifest with your actual contracts. The census workflow is supplied; it becomes a merge requirement only after the owner configures and verifies the branch protections.
 
-That's the whole workflow for you. Everything is already **in this repo** — nothing to install or memorize beyond "Use this template" + the line above. The `Quickstart` and `docs/` below are the details the agents follow.
+The repository supplies the census code and workflow. The owner must configure and test the day-one protections; the additional project machinery listed in working rule 38 is not included.
 
 ## Day-one repo setup (do this before the first agent touches the repo)
 
-A gate that nothing enforces is only advice, and a local hook is not enforcement: a text-matching hook cannot see a merge performed inside a script. The wall is the host. On day one, as the repo owner, in the browser:
+A gate that nothing enforces is only advice, and a local hook is not enforcement: a text-matching hook cannot see a merge performed inside a script. The intended enforcement boundary is the host configuration, verified by the tests below. On day one, as the repo owner, in the browser:
 
 1. **A ruleset on `main`** (Settings → Rules → Rulesets → New branch ruleset, enforcement Active):
    - require a pull request before merging, with review from code owners required (item 3); no agent identity merges into `main` at any tier (`docs/WORKING_RULES.md` rule 1);
    - require status checks to pass, with "branches up to date" ticked: add the gate's `census` check (workflow `checkpoint-census`), the lens status (item 4) and every other CI check the moment it first reports;
    - restrict deletions and block force pushes;
    - **no bypass list.** In an emergency, switch the ruleset off yourself and back on.
-2. **Agents act under their own machine identity, never your login.** One identity (a separate account or app) for the coordinator and builders, a second one for the lens lane, each with a fine-grained, least-privilege token: Contents, Pull requests, Actions, Workflows and Metadata only, never Administration, never Secrets. Keep each token in that lane's gitignored `.env.local`; the coordinator session never holds the lens identity's token. Why: your review is then a second identity in fact, and an admin bypass or an approval can no longer be an agent's.
-3. **Owner-tier paths carry your required review.** A `.github/CODEOWNERS` file names you on every tier-2 and tier-3 path (`.github/`, CI scripts, scan config, analyzer waiver databases, census manifests, agent instruction files, `src/`), and every ruleset, the integration branch's included, requires review from code owners. The integration branch is PR-only too, so a tier-1 merge passes the host's code-owner and lens-status checks (a local merge pushed straight to the branch would skip both), and its ruleset lets the agent identity merge tier-1 changes there and nothing else. Why: the tier wall of rule 1 is then enforced by the host, whatever runs locally.
-4. **The lens verdict is a required status.** The lens identity posts a commit status (or a review) on the exact head it read, and the ruleset of every branch the coordinator merges into requires it. Why: the merging seat cannot mint a verdict it holds no credential for (rule 1h); on one machine under one user this is the only form that is a wall.
-5. **Then test the wall once,** from the coordinator's identity: a tier-2 change on the integration branch, any merge into `main`, and any merge without the lens status must each be refused by the host.
+2. **Use separate service identities for coordinator/builders and lenses.** Give each only the permissions its role needs, never Administration or Secrets. Keep the lens credential outside the coordinator's readable and writable environment; separate token files alone do not establish that boundary.
+3. **Configure and test the owner boundary.** Configure owner review for every owner-tier path, including `.github/CODEOWNERS` itself, and PR-only integration. Verify that the coordinator cannot merge owner-tier changes, including after owner approval, and cannot merge anything into `main`. Required review alone is not evidence that the merger is restricted.
+4. **Configure and test independent lens acceptance.** Choose the exact status-check or review mechanism the host will enforce. Verify its authorized issuer, exact reviewed commit and integration binding. Verify that coordinator credentials cannot create a substitute acceptance. Do not assume reviews and commit statuses are interchangeable.
+5. **Record the host tests before enabling coordinator merges.** Using disposable fixtures, test missing owner review, code-owner review with the configured general-approval count, missing or failing checks, stale-head acceptance, acceptance from the wrong issuer, direct pushes with missing and passing checks, owner-tier integration merges and every coordinator merge into `main`. Record the repository, identities, permissions and ruleset configuration tested. Repeat affected tests after those inputs change. A result establishes the tested configuration and cases only; an unverified boundary leaves coordinator merging disabled.
 6. **Local hooks are defence in depth.** Your guard hook may refuse merge and force commands by their text, and it names the one permitted merge script by absolute path and checksum, an exception you write yourself (rule 1i). It cannot see inside a script, so it never replaces items 1-5.
 7. **CI order:** the secret scan runs first, in its own job, on a fresh checkout with the base branch's config; every job that runs repo code depends on it.
 8. **Gate files** (the workflows, CI scripts and scan config) are tier 2: they change only through a labelled PR that you merge.
@@ -65,7 +65,7 @@ python3 tools/checkpoint_census.py --release checkpoint   # must be 0 hard failu
 - **gate-green ≠ correct** — a green gate proves coverage/binding, not truth. The adversarial content audit is done *on top of* a green gate, before landing.
 - **controls are decisive and bound to bytes** — every negative control is shown failing with its guard removed; positive controls read the real committed input; constants are re-earned on the merged tree (tenets 12-15).
 - **merges are priced by undo cost** — a script decides the tier from what changed and fails closed; the coordinator merges tier 1 only, never into `main`; the host, not a local hook, is the wall (rule 1).
-- **landings are checked by script, then by a non-author lens** — the final line names a real commit, nothing was rewritten, and the selftest is re-run by the coordinator (rules 33-34).
+- **landings are checked by script, then by a non-author lens** — the coordinator's landing record names a real implementation commit, nothing was rewritten, and the selftest is re-run by the coordinator (rules 33-34).
 - **no force flags, ever** — no agent rewrites a pushed branch or runs a force flag; a refused destructive action is never retried (rule 23).
 
 Full detail: [`docs/SOLIDITY_VERIFICATION_HARNESS.md`](docs/SOLIDITY_VERIFICATION_HARNESS.md) and the gate spec [`tools/CHECKPOINT_CENSUS.md`](tools/CHECKPOINT_CENSUS.md). Requires Foundry + Python 3.11+.
