@@ -61,7 +61,7 @@ Added 2026-11 after a night of parallel one-shot lanes. A headless lane is one n
 
 | Lane | Sandbox | Can | Cannot | Hands back |
 |---|---|---|---|---|
-| Author | `workspace-write` on its own tree | edit the brief's allowed paths; offline build, lint and non-fork tests; write the fork-run list (exact commands, environment, expected counts) | any network, loopback included (no RPC, no fork test, no local cache server); git metadata writes (`.git` is read-only: no add, commit or branch); system counters such as `sysctl`; temp files, which may be denied | the changed files in place, its own commit message file, the run records, the final line |
+| Author | `workspace-write` on its own tree | edit the brief's allowed paths; offline build, lint and non-fork tests; write the fork-run list (exact commands, environment, expected counts) | any network, loopback included (no RPC, no fork test, no local cache server); git metadata writes (`.git` is read-only: no add, commit or branch); system counters such as `sysctl`; temp files, which may be denied | the changed files in place, its own commit message file, the run records, the final record |
 | Run | a lane with network, outside the author's sandbox, behind the gate wrapper | run the author lane's fork-run list through the read cache; capture evidence; commit the evidence on its own branch | rewrite history; broadcast to a live chain; run a heavy tool outside the wrapper | the evidence commits, the run records, the final line naming the commit |
 | Lens | `read-only` | read the tree and the named sources; replay selftests, in memory when temp files are denied | write anything; network; git writes | a verdict, findings with exact rewrites, and how each selftest was run |
 

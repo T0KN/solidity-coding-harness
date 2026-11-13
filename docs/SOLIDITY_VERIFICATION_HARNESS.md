@@ -6,7 +6,7 @@
 
 ## Why
 
-Contract code is adversarial, immutable once deployed, and moves money. "It compiled" and "the suite is green" are the two most expensive false comforts in the domain. This harness replaces conviction-by-vibes with **coverage + citation + executed proof + independent audit**, mechanically enforced so it cannot quietly lapse.
+Contract code is adversarial, immutable once deployed, and moves money. "It compiled" and "the suite is green" are the two most expensive false comforts in the domain. This harness replaces conviction-by-vibes with **coverage + citation + executed proof + independent audit**, checked by a machine gate that becomes a merge requirement once the owner configures and verifies the branch protections, so it cannot quietly lapse.
 
 ## The tenets
 
@@ -22,7 +22,7 @@ Contract code is adversarial, immutable once deployed, and moves money. "It comp
 
 6. **Author in the target format, from source.** Read the gate/schema first, read the source item-by-item, author each item directly in-target. Never prose-draft-then-reformat. If a machine gate exists, it *is* the format spec.
 
-7. **Mechanical enforcement — the census gate.** A required CI check reads the checker's plan + evidence against the *compiled* source and refuses to close a module unless coverage, value-edges, call-resolutions, obligations, provenance, and evidence are all complete. Convention drifts; a required check does not.
+7. **Mechanical enforcement — the census gate.** A CI check, required once the owner configures and verifies the branch protections, reads the checker's plan + evidence against the *compiled* source and refuses to close a module unless coverage, value-edges, call-resolutions, obligations, provenance, and evidence are all complete. Convention drifts; a required check does not.
 
 8. **Verified proof-of-check (pinned-fork evidence).** A row/obligation is PASS only with a replayable evidence record: live fork pinned at run start (chain id + block number + block hash + `pinned_at_run_start`), hashed test sources + raw artifacts, derived action counts, and per-edge witnesses reconciling the exact identity claimed (`owed==delivered==debit>0`; burn/lock `minted==burned/locked>0, residue==0`), bound by an assertion hash. Never a test name or the word "PASS".
 
